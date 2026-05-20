@@ -176,7 +176,7 @@ interface PlaceSuggestion {
         <div class="row g-3">
           <div class="col-md-4">
             <label class="form-label">Departure Time</label>
-            <input type="datetime-local" class="form-control" [(ngModel)]="form.departureTime" name="departureTime" required>
+            <input type="datetime-local" class="form-control" [(ngModel)]="form.departureTime" name="departureTime" [min]="minDateTime()" required>
           </div>
           <div class="col-md-2">
             <label class="form-label">Available Seats</label>
@@ -283,6 +283,12 @@ export class CreateTrip implements AfterViewInit, OnDestroy {
 
   error = signal('');
   success = signal(false);
+
+  minDateTime(): string {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  }
 
   addStop() {
     this.form.stops.push({ stopName: '', lat: null, lng: null });
@@ -651,6 +657,12 @@ export class CreateTrip implements AfterViewInit, OnDestroy {
     this.loading.set(true);
     this.error.set('');
     this.success.set(false);
+
+    if (!this.form.departureTime || new Date(this.form.departureTime) <= new Date()) {
+      this.error.set('Departure time must be in the future');
+      this.loading.set(false);
+      return;
+    }
 
     if (this.form.recurring) {
       if (!this.form.recurringDays || !this.form.recurringDays.trim()) {

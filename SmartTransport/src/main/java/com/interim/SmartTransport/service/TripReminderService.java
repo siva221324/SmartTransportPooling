@@ -63,4 +63,44 @@ public class TripReminderService {
             log.info("Sent reminders for trip {} ({} passengers)", trip.getId(), approved.size());
         }
     }
+
+    // Run once daily at midnight — auto-cancel trips that were never started the previous day
+    @Scheduled(cron = "0 0 0 * * *")
+    @org.springframework.transaction.annotation.Transactional
+    public void cancelExpiredTrips() {
+        java.time.LocalDate today = java.time.LocalDate.now();
+
+        List<Trip> expired = tripRepository.findAll().stream()
+                .filter(t -> t.getStatus() == TripStatus.SCHEDULED)
+                .filter(t -> t.getDepartureTime().toLocalDate().isBefore(today))
+                .toList();
+
+        for (Trip trip : expired) {
+            trip.setStatus(TripStatus.CANCELLED);
+            tripRepository.save(trip);
+
+            List<Booking> activeBookings = bookingRepository.findByTripId(trip.getId()).stream()
+                    .filter(b -> b.getStatus() == BookingStatus.PENDING || b.getStatus() == BookingStatus.APPROVED)
+                    .toList();
+
+            for (Booking booking : activeBookings) {
+                booking.setStatus(BookingStatus.CANCELLED);
+                bookingRepository.save(booking);
+
+                notificationService.notify(booking.getPassenger(), NotificationType.TRIP_CANCELLED,
+                        "Trip Automatically Cancelled",
+                        "The trip " + trip.getOrigin() + " → " + trip.getDestination() +
+                        " was cancelled because it was not started before departure time.",
+                        trip.getId());
+            }
+
+            notificationService.notify(trip.getDriver(), NotificationType.TRIP_CANCELLED,
+                    "Trip Expired",
+                    "Your trip " + trip.getOrigin() + " → " + trip.getDestination() +
+                    " was automatically cancelled as it was not started by departure time.",
+                    trip.getId());
+
+            log.info("Auto-cancelled expired trip {} ({} bookings cancelled)", trip.getId(), activeBookings.size());
+        }
+    }
 }

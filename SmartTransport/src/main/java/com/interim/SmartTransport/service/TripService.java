@@ -37,6 +37,10 @@ public class TripService {
 
     @Transactional
     public List<Trip> createTrip(String driverEmail, TripRequest request) {
+        if (request.getDepartureTime() == null || request.getDepartureTime().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Departure time must be in the future");
+        }
+
         User driver = userRepository.findByEmail(driverEmail)
                 .orElseThrow(() -> new RuntimeException("Driver not found"));
 

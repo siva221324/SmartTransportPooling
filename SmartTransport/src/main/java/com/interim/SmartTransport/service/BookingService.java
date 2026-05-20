@@ -38,6 +38,10 @@ public class BookingService {
 
         if (seatsRequested < 1) seatsRequested = 1;
 
+        if (trip.getDepartureTime().isBefore(java.time.LocalDateTime.now())) {
+            throw new RuntimeException("Cannot book a trip that has already departed");
+        }
+
         BookingType bookingType = BookingType.SINGLE;
         try { bookingType = BookingType.valueOf(bookingTypeStr); } catch (Exception ignored) {}
 

@@ -20,16 +20,17 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
 
     List<Trip> findByRecurringGroupId(String recurringGroupId);
 
-    @Query("SELECT DISTINCT t.origin FROM Trip t WHERE t.status = 'SCHEDULED' AND t.availableSeats > 0")
+    @Query("SELECT DISTINCT t.origin FROM Trip t WHERE t.status = 'SCHEDULED' AND t.availableSeats > 0 AND t.departureTime > CURRENT_TIMESTAMP")
     List<String> findDistinctOrigins();
 
-    @Query("SELECT DISTINCT t.destination FROM Trip t WHERE t.status = 'SCHEDULED' AND t.availableSeats > 0")
+    @Query("SELECT DISTINCT t.destination FROM Trip t WHERE t.status = 'SCHEDULED' AND t.availableSeats > 0 AND t.departureTime > CURRENT_TIMESTAMP")
     List<String> findDistinctDestinations();
 
-    @Query("SELECT DISTINCT s.stopName FROM TripStop s JOIN s.trip t WHERE t.status = 'SCHEDULED' AND t.availableSeats > 0")
+    @Query("SELECT DISTINCT s.stopName FROM TripStop s JOIN s.trip t WHERE t.status = 'SCHEDULED' AND t.availableSeats > 0 AND t.departureTime > CURRENT_TIMESTAMP")
     List<String> findDistinctStopNames();
 
     @Query("SELECT t FROM Trip t WHERE t.status = 'SCHEDULED' " +
+            "AND t.departureTime > CURRENT_TIMESTAMP " +
             "AND (:origin IS NULL OR LOWER(t.origin) LIKE LOWER(CONCAT('%', :origin, '%')) " +
             "     OR EXISTS (SELECT 1 FROM TripStop s WHERE s.trip = t AND LOWER(s.stopName) LIKE LOWER(CONCAT('%', :origin, '%')))) " +
             "AND (:destination IS NULL OR LOWER(t.destination) LIKE LOWER(CONCAT('%', :destination, '%')) " +
