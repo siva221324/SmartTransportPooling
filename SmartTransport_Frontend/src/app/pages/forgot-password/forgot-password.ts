@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -17,14 +17,14 @@ import { finalize } from 'rxjs';
           <p class="text-muted">Enter your email to receive a reset link</p>
         </div>
 
-        @if (error) {
+        @if (error()) {
           <div class="alert alert-danger alert-dismissible fade show">
-            {{ error }}
-            <button type="button" class="btn-close" (click)="error = ''"></button>
+            {{ error() }}
+            <button type="button" class="btn-close" (click)="error.set('')"></button>
           </div>
         }
 
-        @if (sent) {
+        @if (sent()) {
           <div class="alert alert-success">
             <i class="bi bi-check-circle me-2"></i>
             A password reset link has been sent to <strong>{{ email }}</strong>. Please check your inbox.
@@ -42,8 +42,8 @@ import { finalize } from 'rxjs';
                        placeholder="you@organization.com" required>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100 mb-3" [disabled]="loading">
-              @if (loading) {
+            <button type="submit" class="btn btn-primary w-100 mb-3" [disabled]="loading()">
+              @if (loading()) {
                 <span class="spinner-border spinner-border-sm me-2"></span>
               }
               Send Reset Link
@@ -62,23 +62,24 @@ export class ForgotPassword {
   private toast = inject(ToastService);
 
   email = '';
-  error = '';
-  loading = false;
-  sent = false;
+  error = signal('');
+  loading = signal(false);
+  sent = signal(false);
 
   onSubmit() {
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
     this.auth.forgotPassword(this.email).pipe(
-      finalize(() => this.loading = false)
+      finalize(() => this.loading.set(false))
     ).subscribe({
       next: () => {
-        this.sent = true;
+        this.sent.set(true);
         this.toast.success('Reset link sent! Check your email.');
       },
       error: (err) => {
-        this.error = err.error?.message || err.error || 'Failed to send reset link';
-        this.toast.error(this.error);
+        const msg = err.error?.message || err.error || 'Failed to send reset link';
+        this.error.set(msg);
+        this.toast.error(msg);
       }
     });
   }

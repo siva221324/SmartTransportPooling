@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -42,17 +42,17 @@ import { ToastService } from '../../services/toast.service';
           <h3 class="fw-bold mb-1">Create Account</h3>
           <p class="text-muted mb-4">Use your organization email to get started</p>
 
-          @if (error) {
+          @if (error()) {
             <div class="alert alert-danger alert-dismissible fade show">
-              {{ error }}
-              <button type="button" class="btn-close" (click)="error = ''"></button>
+              {{ error() }}
+              <button type="button" class="btn-close" (click)="error.set('')"></button>
             </div>
           }
 
-          @if (registered) {
+          @if (registered()) {
             <div class="alert alert-success">
               <i class="bi bi-envelope-check me-2"></i>
-              Account created! A verification email has been sent to <strong>{{ form.email }}</strong>.
+              Account created! A verification email has been sent to <strong>{{ form.email }}</strong>. Please check your inbox and verify your email before signing in.
               Please check your inbox and verify your email before signing in.
             </div>
             <a routerLink="/login" class="btn btn-primary w-100 btn-lg">Go to Sign In</a>
@@ -97,8 +97,8 @@ import { ToastService } from '../../services/toast.service';
                 <input type="text" class="form-control form-control-modern" [(ngModel)]="form.city" name="city" placeholder="e.g. Coimbatore" required>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100 btn-lg mb-3" [disabled]="loading">
-              @if (loading) {
+            <button type="submit" class="btn btn-primary w-100 btn-lg mb-3" [disabled]="loading()">
+              @if (loading()) {
                 <span class="spinner-border spinner-border-sm me-2"></span>
               }
               Create Account <i class="bi bi-arrow-right ms-1"></i>
@@ -182,23 +182,24 @@ export class Register {
   private toast = inject(ToastService);
 
   form = { name: '', email: '', password: '', phone: '', gender: '', department: '', city: '', role: 'USER' };
-  error = '';
-  loading = false;
-  registered = false;
+  error = signal('');
+  loading = signal(false);
+  registered = signal(false);
 
   onRegister() {
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
     this.auth.register(this.form).subscribe({
       next: () => {
-        this.loading = false;
-        this.registered = true;
+        this.loading.set(false);
+        this.registered.set(true);
         this.toast.success('Account created! Check your email to verify.');
       },
       error: (err) => {
-        this.loading = false;
-        this.error = err.error?.message || 'Registration failed. Ensure your email domain is whitelisted.';
-        this.toast.error(this.error);
+        this.loading.set(false);
+        const msg = err.error?.message || 'Registration failed. Ensure your email domain is whitelisted.';
+        this.error.set(msg);
+        this.toast.error(msg);
       }
     });
   }

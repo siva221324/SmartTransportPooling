@@ -27,10 +27,10 @@ interface PlaceSuggestion {
       <p>Post a new ride for passengers</p>
     </div>
 
-    @if (error) {
-      <div class="alert alert-danger">{{ error }}</div>
+    @if (error()) {
+      <div class="alert alert-danger">{{ error() }}</div>
     }
-    @if (success) {
+    @if (success()) {
       <div class="alert alert-success">Trip(s) created successfully!</div>
     }
 
@@ -182,19 +182,10 @@ interface PlaceSuggestion {
             <label class="form-label">Available Seats</label>
             <input type="number" class="form-control" [(ngModel)]="form.availableSeats" name="availableSeats" min="1" required>
           </div>
-          @if (!form.recurring) {
-            <div class="col-md-3">
-              <label class="form-label">Price per Seat <span class="text-danger">*</span></label>
-              <input type="number" class="form-control" [(ngModel)]="form.pricePerSeat" name="pricePerSeat" step="0.01" required>
-            </div>
-          }
-          @if (form.recurring) {
-            <div class="col-md-3">
-              <label class="form-label">Daily Rate <span class="text-danger">*</span></label>
-              <input type="number" class="form-control" [(ngModel)]="form.dailyRate" name="dailyRate" step="0.01" required>
-              <small class="text-muted">Per seat per day</small>
-            </div>
-          }
+          <div class="col-md-3">
+            <label class="form-label">Price per Seat <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" [(ngModel)]="form.pricePerSeat" name="pricePerSeat" step="0.01" required>
+          </div>
 
           <div class="col-md-4">
             <label class="form-label">Approval Mode</label>
@@ -203,23 +194,6 @@ interface PlaceSuggestion {
               <option value="AUTO">Auto-Accept</option>
             </select>
           </div>
-
-          <div class="col-md-4">
-            <div class="form-check mt-4">
-              <input class="form-check-input" type="checkbox" [(ngModel)]="form.recurring" name="recurring" id="recurring"
-                     (change)="onRecurringToggle()">
-              <label class="form-check-label" for="recurring">Recurring Trip</label>
-            </div>
-          </div>
-
-          @if (form.recurring) {
-            <div class="col-md-4">
-              <label class="form-label">Recurring Days <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" [(ngModel)]="form.recurringDays" name="recurringDays"
-                     placeholder="MON,TUE,WED,THU,FRI" required>
-              <small class="text-muted">e.g. MON,TUE,WED,THU,FRI</small>
-            </div>
-          }
         </div>
 
         <!-- Intermediate Stops -->
@@ -258,64 +232,24 @@ interface PlaceSuggestion {
   `,
   styles: [`
     :host { display: block; }
-    .pg-head { margin-bottom: 24px; }
+    .pg-head { margin-bottom: 20px; }
     .pg-head h2 { font-weight: 800; font-size: 1.5rem; color: #f0f0f5; margin: 0; }
     .pg-head p { color: rgba(255,255,255,0.4); margin: 4px 0 0; }
-    .create-trip-map {
-      height: 420px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.08);
-      z-index: 0;
-      cursor: crosshair !important;
-    }
+    .create-trip-map { height: 420px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); z-index: 0; cursor: crosshair !important; }
     .suggestions-dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: #1c1c2e;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-top: none;
-      border-radius: 0 0 12px 12px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-      z-index: 1050;
-      max-height: 260px;
-      overflow-y: auto;
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: #1c1c2e; border: 1px solid rgba(255,255,255,0.08);
+      border-top: none; border-radius: 0 0 10px 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      z-index: 1050; max-height: 260px; overflow-y: auto;
     }
-    .suggestion-item {
-      display: flex;
-      align-items: flex-start;
-      padding: 10px 14px;
-      cursor: pointer;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      transition: background 0.15s;
-      color: #f0f0f5;
-    }
-    .suggestion-item:hover {
-      background: rgba(108,99,255,0.08);
-    }
-    .suggestion-item:last-child {
-      border-bottom: none;
-    }
-    .suggestion-main {
-      font-weight: 500;
-      font-size: 0.95rem;
-    }
-    .suggestion-detail {
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.35);
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .badge {
-      font-size: 0.82rem;
-      padding: 5px 10px;
-    }
-    .map-pick-hint {
-      min-height: 22px;
-    }
+    .suggestion-item { display: flex; align-items: flex-start; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; color: #f0f0f5; }
+    .suggestion-item:hover { background: rgba(108,99,255,0.08); }
+    .suggestion-item:last-child { border-bottom: none; }
+    .suggestion-main { font-weight: 500; font-size: 0.95rem; }
+    .suggestion-detail { font-size: 0.78rem; color: rgba(255,255,255,0.35); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+    .badge { font-size: 0.82rem; padding: 5px 10px; }
+    .map-pick-hint { min-height: 22px; }
   `]
 })
 export class CreateTrip implements AfterViewInit, OnDestroy {
@@ -331,8 +265,7 @@ export class CreateTrip implements AfterViewInit, OnDestroy {
   form: TripRequest = {
     origin: '', destination: '', originLat: null, originLng: null, destLat: null, destLng: null,
     departureTime: '', availableSeats: 1, pricePerSeat: null, dailyRate: null,
-    recurring: false, recurringDays: '', approvalMode: 'MANUAL', vehicleId: null,
-    stops: []
+    recurring: false, recurringDays: '', approvalMode: 'MANUAL', vehicleId: null, stops: []
   };
 
   loading = signal(false);
@@ -348,17 +281,8 @@ export class CreateTrip implements AfterViewInit, OnDestroy {
   gpsLoading = signal(false);
   gpsTarget = signal<'origin' | 'destination' | ''>('');
 
-  error = '';
-  success = false;
-
-  onRecurringToggle() {
-    if (this.form.recurring) {
-      this.form.pricePerSeat = null;
-    } else {
-      this.form.dailyRate = null;
-      this.form.recurringDays = '';
-    }
-  }
+  error = signal('');
+  success = signal(false);
 
   addStop() {
     this.form.stops.push({ stopName: '', lat: null, lng: null });
@@ -725,23 +649,23 @@ export class CreateTrip implements AfterViewInit, OnDestroy {
 
   onCreate() {
     this.loading.set(true);
-    this.error = '';
-    this.success = false;
+    this.error.set('');
+    this.success.set(false);
 
     if (this.form.recurring) {
       if (!this.form.recurringDays || !this.form.recurringDays.trim()) {
-        this.error = 'Recurring trips require at least one day (e.g. MON,TUE)';
+        this.error.set('Recurring trips require at least one day (e.g. MON,TUE)');
         this.loading.set(false);
         return;
       }
       if (!this.form.dailyRate || this.form.dailyRate <= 0) {
-        this.error = 'Recurring trips require a daily rate';
+        this.error.set('Recurring trips require a daily rate');
         this.loading.set(false);
         return;
       }
     } else {
       if (!this.form.pricePerSeat || this.form.pricePerSeat <= 0) {
-        this.error = 'Please enter a price per seat';
+        this.error.set('Please enter a price per seat');
         this.loading.set(false);
         return;
       }
@@ -750,14 +674,15 @@ export class CreateTrip implements AfterViewInit, OnDestroy {
     this.tripService.createTrip(this.form).subscribe({
       next: () => {
         this.loading.set(false);
-        this.success = true;
+        this.success.set(true);
         this.toast.success('Trip(s) created successfully!');
         setTimeout(() => this.router.navigate(['/my-trips']), 1500);
       },
       error: (err) => {
         this.loading.set(false);
-        this.error = err.error?.message || 'Failed to create trip';
-        this.toast.error(this.error);
+        const msg = err.error?.message || 'Failed to create trip';
+        this.error.set(msg);
+        this.toast.error(msg);
       }
     });
   }

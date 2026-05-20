@@ -63,7 +63,7 @@ interface AdminStats {
       border-radius: 14px; padding: 18px; display: flex; align-items: center; gap: 14px;
       transition: all 0.3s;
     }
-    .acard:hover { border-color: var(--c); transform: translateY(-2px); }
+    .acard:hover { border-color: var(--c); }
     .acard-ic {
       width: 42px; height: 42px; border-radius: 12px;
       background: color-mix(in srgb, var(--c) 15%, transparent);
@@ -72,7 +72,7 @@ interface AdminStats {
     }
     .acard-num { font-size: 1.5rem; font-weight: 800; color: #fff; display: block; line-height: 1; }
     .acard small { color: rgba(255,255,255,0.35); font-size: 0.72rem; }
-    .panel { background: #1c1c2e; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; overflow: hidden; }
+    .panel { background: #1c1c2e; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; }
     .panel-body { padding: 20px; }
   `]
 })

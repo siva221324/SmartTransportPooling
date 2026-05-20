@@ -274,37 +274,22 @@ interface PlaceSuggestion {
   `,
   styles: [`
     :host { display: block; }
-    .page-head { margin-bottom: 24px; }
+    .page-head { margin-bottom: 20px; }
     .page-head h2 { font-weight: 800; font-size: 1.5rem; color: #f0f0f5; margin: 0; }
     .page-head p { color: rgba(255,255,255,0.4); margin: 4px 0 0; }
 
-    .filter-panel {
-      background: #1c1c2e; border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px; padding: 24px; margin-bottom: 24px;
-    }
-    .input-icon { position: relative; }
-    .input-icon i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); z-index: 2; }
-    .input-icon input { padding-left: 32px; }
+    .filter-panel { background: #1c1c2e; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
 
-    .search-map {
-      height: 380px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.08);
-      z-index: 0;
-      cursor: crosshair !important;
-    }
+    .search-map { height: 380px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); z-index: 0; cursor: crosshair !important; }
+
     .suggestions-dropdown {
       position: absolute; top: 100%; left: 0; right: 0;
       background: #1c1c2e; border: 1px solid rgba(255,255,255,0.08);
-      border-top: none; border-radius: 0 0 12px 12px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      border-top: none; border-radius: 0 0 10px 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
       z-index: 1050; max-height: 260px; overflow-y: auto;
     }
-    .suggestion-item {
-      display: flex; align-items: flex-start; padding: 10px 14px;
-      cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.04);
-      transition: background 0.15s; color: #f0f0f5;
-    }
+    .suggestion-item { display: flex; align-items: flex-start; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; color: #f0f0f5; }
     .suggestion-item:hover { background: rgba(108,99,255,0.08); }
     .suggestion-item:last-child { border-bottom: none; }
     .suggestion-section-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 14px 4px; color: rgba(255,255,255,0.35); border-bottom: 1px solid rgba(255,255,255,0.06); }
@@ -323,16 +308,13 @@ interface PlaceSuggestion {
 
     .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
 
-    .ride-card {
-      background: #1c1c2e; border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px; padding: 20px; transition: all 0.3s;
-    }
-    .ride-card:hover { border-color: rgba(108,99,255,0.3); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+    .ride-card { background: #1c1c2e; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px; transition: border-color 0.2s; }
+    .ride-card:hover { border-color: rgba(108,99,255,0.25); }
 
-    .ride-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .ride-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .recur-tag { font-size: 0.75rem; color: #3498db; font-weight: 600; display: flex; align-items: center; gap: 4px; }
 
-    .ride-route { display: flex; gap: 14px; margin-bottom: 16px; }
+    .ride-route { display: flex; gap: 14px; margin-bottom: 14px; }
     .route-vis { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 4px; }
     .rdot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
     .rdot.from { background: #6c63ff; }
@@ -342,37 +324,25 @@ interface PlaceSuggestion {
     .route-names .dest { color: rgba(255,255,255,0.7); }
     .stops-line { font-size: 0.78rem; color: rgba(255,255,255,0.4); font-weight: 400; }
 
-    .ride-meta { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.78rem; color: rgba(255,255,255,0.35); margin-bottom: 16px; }
+    .ride-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.78rem; color: rgba(255,255,255,0.35); margin-bottom: 14px; }
     .ride-meta i { margin-right: 4px; }
 
-    .ride-bottom { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .ride-bottom { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .ride-price strong { font-size: 1.3rem; color: #2ecc71; }
     .ride-price small { color: rgba(255,255,255,0.35); margin-left: 2px; }
-    .view-ride-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 18px; border-radius: 50px;
-      background: rgba(108,99,255,0.12); color: #8f88ff;
-      text-decoration: none; font-weight: 600; font-size: 0.85rem;
-      transition: all 0.2s;
-    }
-    .view-ride-btn:hover { background: rgba(108,99,255,0.25); color: #fff; }
+    .view-ride-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 8px; background: rgba(108,99,255,0.12); color: #8f88ff; text-decoration: none; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; }
+    .view-ride-btn:hover { background: rgba(108,99,255,0.22); color: #fff; }
 
-    .ride-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.04); }
+    .ride-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.04); }
     .driver-chip { display: flex; align-items: center; gap: 8px; }
-    .driver-avatar {
-      width: 28px; height: 28px; border-radius: 8px;
-      background: rgba(108,99,255,0.15); color: #8f88ff;
-      display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
-    }
+    .driver-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(108,99,255,0.15); color: #8f88ff; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
     .driver-chip span { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
-    .auto-tag { font-size: 0.7rem; background: rgba(46,204,113,0.15); color: #2ecc71; padding: 3px 8px; border-radius: 50px; font-weight: 600; }
+    .auto-tag { font-size: 0.7rem; background: rgba(46,204,113,0.15); color: #2ecc71; padding: 3px 8px; border-radius: 6px; font-weight: 600; }
 
     .vehicle-info { font-size: 0.78rem; color: rgba(255,255,255,0.3); margin-top: 10px; }
     .vehicle-info i { margin-right: 4px; }
 
-    @media (max-width: 768px) {
-      .results-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 768px) { .results-grid { grid-template-columns: 1fr; } }
   `]
 })
 export class SearchTrips implements OnInit, AfterViewInit, OnDestroy {
@@ -497,6 +467,22 @@ export class SearchTrips implements OnInit, AfterViewInit, OnDestroy {
     const center = this.map?.getCenter();
     const lat = center?.lat || 12.9716;
     const lng = center?.lng || 77.5946;
+    const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query)
+      + '&format=json&addressdetails=1&limit=6&countrycodes=in';
+    fetch(url, { headers: { 'Accept-Language': 'en' } })
+      .then(res => res.json())
+      .then((results: any[]) => {
+        const suggestions: PlaceSuggestion[] = results.map(r => ({
+          ...r, lat: r.lat, lon: r.lon,
+          short: this.shortName(r.address, r.display_name)
+        }));
+        if (target === 'origin') this.originSuggestions.set(suggestions);
+        else this.destSuggestions.set(suggestions);
+      })
+      .catch(() => this.searchPlacesFallback(query, target, lat, lng));
+  }
+
+  private searchPlacesFallback(query: string, target: 'origin' | 'destination', lat: number, lng: number) {
     const url = 'https://photon.komoot.io/api/?q=' + encodeURIComponent(query)
       + '&lat=' + lat + '&lon=' + lng + '&limit=6&lang=en';
     fetch(url).then(res => res.json()).then((data: any) => {
@@ -519,20 +505,6 @@ export class SearchTrips implements OnInit, AfterViewInit, OnDestroy {
           short: parts.slice(0, 2).join(', ') || p.label || ''
         } as PlaceSuggestion;
       });
-      if (target === 'origin') this.originSuggestions.set(suggestions);
-      else this.destSuggestions.set(suggestions);
-    }).catch(() => this.searchPlacesFallback(query, target, lat, lng));
-  }
-
-  private searchPlacesFallback(query: string, target: 'origin' | 'destination', lat: number, lng: number) {
-    const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query)
-      + '&format=json&addressdetails=1&limit=6&countrycodes=in'
-      + '&viewbox=' + (lng - 0.3) + ',' + (lat + 0.3) + ',' + (lng + 0.3) + ',' + (lat - 0.3) + '&bounded=1';
-    fetch(url, { headers: { 'Accept-Language': 'en' } }).then(res => res.json()).then((results: any[]) => {
-      const suggestions: PlaceSuggestion[] = results.map(r => ({
-        ...r, lat: r.lat, lon: r.lon,
-        short: this.shortName(r.address, r.display_name)
-      }));
       if (target === 'origin') this.originSuggestions.set(suggestions);
       else this.destSuggestions.set(suggestions);
     }).catch(() => {});

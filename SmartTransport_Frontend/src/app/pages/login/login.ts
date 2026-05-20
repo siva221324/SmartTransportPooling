@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -43,10 +43,10 @@ import { finalize } from 'rxjs';
           <h3 class="fw-bold mb-1">Sign In</h3>
           <p class="text-muted mb-4">Enter your credentials to access your account</p>
 
-          @if (error) {
+          @if (error()) {
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-              {{ error }}
-              <button type="button" class="btn-close" (click)="error = ''"></button>
+              {{ error() }}
+              <button type="button" class="btn-close" (click)="error.set('')"></button>
             </div>
           }
 
@@ -70,8 +70,8 @@ import { finalize } from 'rxjs';
                        placeholder="••••••••" required>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100 btn-lg mb-3" [disabled]="loading">
-              @if (loading) {
+            <button type="submit" class="btn btn-primary w-100 btn-lg mb-3" [disabled]="loading()">
+              @if (loading()) {
                 <span class="spinner-border spinner-border-sm me-2"></span>
               }
               Sign In <i class="bi bi-arrow-right ms-1"></i>
@@ -176,22 +176,23 @@ export class Login {
 
   email = '';
   password = '';
-  error = '';
-  loading = false;
+  error = signal('');
+  loading = signal(false);
 
   onLogin() {
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
     this.auth.login({ email: this.email, password: this.password }).pipe(
-      finalize(() => this.loading = false)
+      finalize(() => this.loading.set(false))
     ).subscribe({
       next: () => {
         this.toast.success('Welcome back!');
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        this.error = err.error?.message || err.error || 'Invalid credentials';
-        this.toast.error(this.error);
+        const msg = err.error?.message || err.error || 'Invalid credentials';
+        this.error.set(msg);
+        this.toast.error(msg);
       }
     });
   }

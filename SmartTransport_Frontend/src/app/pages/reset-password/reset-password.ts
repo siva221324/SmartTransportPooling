@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -17,14 +17,14 @@ import { finalize } from 'rxjs';
           <p class="text-muted">Enter your new password</p>
         </div>
 
-        @if (error) {
+        @if (error()) {
           <div class="alert alert-danger alert-dismissible fade show">
-            {{ error }}
-            <button type="button" class="btn-close" (click)="error = ''"></button>
+            {{ error() }}
+            <button type="button" class="btn-close" (click)="error.set('')"></button>
           </div>
         }
 
-        @if (success) {
+        @if (success()) {
           <div class="alert alert-success">
             <i class="bi bi-check-circle me-2"></i>
             Password reset successfully! You can now sign in with your new password.
@@ -48,8 +48,8 @@ import { finalize } from 'rxjs';
                        placeholder="Re-enter password" required>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100 mb-3" [disabled]="loading">
-              @if (loading) {
+            <button type="submit" class="btn btn-primary w-100 mb-3" [disabled]="loading()">
+              @if (loading()) {
                 <span class="spinner-border spinner-border-sm me-2"></span>
               }
               Reset Password
@@ -72,34 +72,35 @@ export class ResetPassword implements OnInit {
   token = '';
   newPassword = '';
   confirmPassword = '';
-  error = '';
-  loading = false;
-  success = false;
+  error = signal('');
+  loading = signal(false);
+  success = signal(false);
 
   ngOnInit() {
     this.token = this.route.snapshot.queryParamMap.get('token') || '';
     if (!this.token) {
-      this.error = 'Invalid or missing reset token';
+      this.error.set('Invalid or missing reset token');
     }
   }
 
   onSubmit() {
     if (this.newPassword !== this.confirmPassword) {
-      this.error = 'Passwords do not match';
+      this.error.set('Passwords do not match');
       return;
     }
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
     this.auth.resetPassword(this.token, this.newPassword).pipe(
-      finalize(() => this.loading = false)
+      finalize(() => this.loading.set(false))
     ).subscribe({
       next: () => {
-        this.success = true;
+        this.success.set(true);
         this.toast.success('Password reset successfully!');
       },
       error: (err) => {
-        this.error = err.error?.message || err.error || 'Failed to reset password';
-        this.toast.error(this.error);
+        const msg = err.error?.message || err.error || 'Failed to reset password';
+        this.error.set(msg);
+        this.toast.error(msg);
       }
     });
   }

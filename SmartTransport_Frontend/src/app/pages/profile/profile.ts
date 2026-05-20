@@ -29,7 +29,7 @@ import { ToastService } from '../../services/toast.service';
                   <i class="bi bi-camera me-1"></i> Change Photo
                   <input type="file" accept="image/*" hidden (change)="onPicSelected($event)">
                 </label>
-                @if (uploadingPic) { <span class="spinner-border spinner-border-sm ms-2" style="color:#8f88ff"></span> }
+                @if (uploadingPic()) { <span class="spinner-border spinner-border-sm ms-2" style="color:#8f88ff"></span> }
               </div>
               <h5 class="fw-bold" style="color:#f0f0f5">{{ user()!.name }}</h5>
               <p style="color:rgba(255,255,255,0.4)">{{ user()!.email }}</p>
@@ -49,8 +49,8 @@ import { ToastService } from '../../services/toast.service';
           <div class="panel">
             <div class="panel-head"><h6>Edit Profile</h6></div>
             <div class="panel-body">
-              @if (success) { <div class="alert alert-success">Profile updated successfully!</div> }
-              @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+              @if (success()) { <div class="alert alert-success">Profile updated successfully!</div> }
+              @if (error()) { <div class="alert alert-danger">{{ error() }}</div> }
               <form (ngSubmit)="onUpdate()">
                 <div class="mb-3">
                   <label class="form-label">Name</label>
@@ -129,9 +129,9 @@ export class Profile implements OnInit {
   private toast = inject(ToastService);
   user = signal<User | null>(null);
   form = { name: '', email: '', password: '', phone: '', gender: '', department: '', city: '', role: '' };
-  success = false;
-  error = '';
-  uploadingPic = false;
+  success = signal(false);
+  error = signal('');
+  uploadingPic = signal(false);
 
   ngOnInit() {
     this.auth.getProfile().subscribe({
@@ -144,11 +144,11 @@ export class Profile implements OnInit {
   }
 
   onUpdate() {
-    this.success = false;
-    this.error = '';
+    this.success.set(false);
+    this.error.set('');
     this.auth.updateProfile(this.form).subscribe({
-      next: (u) => { this.user.set(u); this.success = true; this.toast.success('Profile updated!'); },
-      error: (err) => { this.error = err.error?.message || 'Update failed'; this.toast.error(this.error); }
+      next: (u) => { this.user.set(u); this.success.set(true); this.toast.success('Profile updated!'); },
+      error: (err) => { const msg = err.error?.message || 'Update failed'; this.error.set(msg); this.toast.error(msg); }
     });
   }
 
@@ -159,15 +159,15 @@ export class Profile implements OnInit {
   onPicSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    this.uploadingPic = true;
+    this.uploadingPic.set(true);
     this.auth.uploadProfilePic(file).subscribe({
       next: (filename) => {
         const u = this.user()!;
         this.user.set({ ...u, profilePic: filename });
-        this.uploadingPic = false;
+        this.uploadingPic.set(false);
         this.toast.success('Profile picture updated!');
       },
-      error: () => { this.uploadingPic = false; this.toast.error('Upload failed'); }
+      error: () => { this.uploadingPic.set(false); this.toast.error('Upload failed'); }
     });
   }
 }

@@ -127,9 +127,6 @@ import { Booking } from '../../models/booking.model';
                 <span><i class="bi bi-gender-ambiguous"></i>{{ trip()!.driver.gender || 'N/A' }}</span>
                 <span><i class="bi bi-diagram-3"></i>{{ trip()!.driver.department || 'N/A' }}</span>
               </div>
-              <a [routerLink]="['/chat', trip()!.id]" class="msg-btn">
-                <i class="bi bi-chat-dots me-1"></i> Message Driver
-              </a>
             </div>
           </div>
 
@@ -270,7 +267,7 @@ import { Booking } from '../../models/booking.model';
     .pg-head p { color: rgba(255,255,255,0.4); margin: 4px 0 0; }
     .loading-state { text-align: center; padding: 60px; }
 
-    .panel { background: #1c1c2e; border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; overflow: hidden; }
+    .panel { background: #1c1c2e; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; }
     .panel-head { padding: 16px 20px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
     .panel-head h6 { margin: 0; font-weight: 700; color: #f0f0f5; font-size: 0.95rem; }
     .panel-body { padding: 20px; }
@@ -302,7 +299,7 @@ import { Booking } from '../../models/booking.model';
       border: 1px solid rgba(255,255,255,0.08);
     }
     .sib-badge:hover { border-color: rgba(108,99,255,0.3); color: #8f88ff; }
-    .sib-badge.current { background: linear-gradient(135deg, #6c63ff, #8f88ff); color: #fff; border-color: transparent; }
+    .sib-badge.current { background: #6c63ff; color: #fff; border-color: transparent; }
     .sib-badge.completed { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.3); }
     .sib-badge.active-trip { background: rgba(46,204,113,0.15); color: #2ecc71; border-color: rgba(46,204,113,0.2); }
 
@@ -314,13 +311,6 @@ import { Booking } from '../../models/booking.model';
     }
     .driver-meta { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
     .driver-meta i { margin-right: 6px; }
-    .msg-btn {
-      display: block; text-align: center; padding: 9px; border-radius: 10px;
-      border: 1px solid rgba(108,99,255,0.2); color: #8f88ff;
-      text-decoration: none; font-weight: 600; font-size: 0.85rem;
-      transition: all 0.2s;
-    }
-    .msg-btn:hover { background: rgba(108,99,255,0.1); color: #fff; }
 
     .v-row { padding: 6px 0; font-size: 0.88rem; color: rgba(255,255,255,0.6); }
     .v-row i { margin-right: 10px; color: rgba(255,255,255,0.3); }
@@ -338,7 +328,7 @@ import { Booking } from '../../models/booking.model';
       color: rgba(255,255,255,0.5); font-weight: 600; font-size: 0.82rem;
       cursor: pointer; transition: all 0.2s;
     }
-    .type-btn.active { background: linear-gradient(135deg, #6c63ff, #8f88ff); border-color: transparent; color: #fff; }
+    .type-btn.active { background: #6c63ff; border-color: transparent; color: #fff; }
 
     .seat-stepper { display: flex; max-width: 160px; }
     .seat-stepper button {
@@ -358,12 +348,11 @@ import { Booking } from '../../models/booking.model';
     .fare-preview strong { color: #2ecc71; }
 
     .book-btn {
-      display: block; width: 100%; padding: 12px; border: none; border-radius: 12px;
-      background: linear-gradient(135deg, #6c63ff, #8f88ff); color: #fff;
-      font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s;
-      box-shadow: 0 4px 15px rgba(108,99,255,0.25);
+      display: block; width: 100%; padding: 12px; border: none; border-radius: 10px;
+      background: #6c63ff; color: #fff;
+      font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: background 0.2s;
     }
-    .book-btn:hover { box-shadow: 0 6px 25px rgba(108,99,255,0.4); transform: translateY(-1px); }
+    .book-btn:hover { background: #7b74ff; }
     .book-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .cancel-btn {
@@ -374,11 +363,11 @@ import { Booking } from '../../models/booking.model';
     .cancel-btn:hover { background: rgba(231,76,60,0.15); }
 
     .track-btn {
-      display: block; text-align: center; padding: 12px; border-radius: 12px;
-      background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff;
-      text-decoration: none; font-weight: 700; transition: all 0.2s;
+      display: block; text-align: center; padding: 12px; border-radius: 10px;
+      background: #2ecc71; color: #fff;
+      text-decoration: none; font-weight: 700; transition: background 0.2s;
     }
-    .track-btn:hover { box-shadow: 0 6px 20px rgba(46,204,113,0.3); transform: translateY(-1px); color: #fff; }
+    .track-btn:hover { background: #27ae60; color: #fff; }
   `]
 })
 export class TripDetail implements OnInit {

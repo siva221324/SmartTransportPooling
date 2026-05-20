@@ -1,5 +1,11 @@
 package com.interim.SmartTransport.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.interim.SmartTransport.model.Booking;
 import com.interim.SmartTransport.model.Trip;
 import com.interim.SmartTransport.model.User;
@@ -10,12 +16,8 @@ import com.interim.SmartTransport.model.enums.NotificationType;
 import com.interim.SmartTransport.repo.BookingRepository;
 import com.interim.SmartTransport.repo.TripRepository;
 import com.interim.SmartTransport.repo.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class BookingService {
     private final TripRepository tripRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final EmailService emailService;
 
     @Transactional
     public Booking requestBooking(Long tripId, String passengerEmail, int seatsRequested, String bookingTypeStr, String bookedDays) {
@@ -165,6 +168,8 @@ public class BookingService {
                 "Your booking for " + trip.getOrigin() + " → " + trip.getDestination() + " has been approved.",
                 trip.getId());
 
+        emailService.sendBookingApprovedEmail(booking.getPassenger().getEmail(), trip.getOrigin(), trip.getDestination());
+
         return saved;
     }
 
@@ -184,6 +189,8 @@ public class BookingService {
                 "Booking Rejected",
                 "Your booking for " + booking.getTrip().getOrigin() + " → " + booking.getTrip().getDestination() + " was rejected by the driver.",
                 booking.getTrip().getId());
+
+        emailService.sendBookingRejectedEmail(booking.getPassenger().getEmail(), booking.getTrip().getOrigin(), booking.getTrip().getDestination());
 
         return saved;
     }
