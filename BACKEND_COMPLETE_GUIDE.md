@@ -8,7 +8,6 @@ It covers:
 - all services
 - all controllers and APIs (endpoint by endpoint)
 - auth and security behavior
-- websocket behavior
 - error format
 
 ---
@@ -49,7 +48,6 @@ For `/api/*` routes:
   - `/api/auth/verify-email`
   - `/api/auth/resend-verification`
   - `/api/auth/profile/picture/*`
-  - `/ws` (websocket handshake)
 - Other routes require `Authorization: Bearer <token>`.
 - If token invalid/missing -> `401`.
 - For `/api/admin/*`, user role must be `ADMIN`, else `403`.

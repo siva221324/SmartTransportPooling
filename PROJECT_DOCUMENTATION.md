@@ -1,5 +1,5 @@
 # SmartTransportPooling — Complete Project Documentation
-### For Interview Preparation | Full Stack (Spring Boot + Angular 19)
+
 
 ---
 
@@ -51,7 +51,7 @@ SmartTransportPooling solves this by allowing employees to **offer rides** (as d
 | **Passenger** | Any user can search and book seats on available trips |
 | **Approval Mode** | Driver chooses MANUAL (they approve each booking) or AUTO (instant booking) |
 | **Booking Flow** | Passenger requests → Driver approves/rejects → Email notification sent |
-| **Real-time** | WebSockets push notifications and chat messages live |
+| **Notifications** | HTTP polling updates notification bell badge every 60 seconds |
 
 ---
 
@@ -93,13 +93,13 @@ SmartTransportPooling solves this by allowing employees to **offer rides** (as d
 │                                                         │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐              │
 │  │  Pages   │  │ Services │  │  Guards  │              │
-│  │(Components│  │(HTTP +   │  │(Route    │              │
-│  │+ Templates│  │WebSocket)│  │Protection│              │
+│  │(Components│  │(HTTP)    │  │(Route    │              │
+│  │+ Templates│  │          │  │Protection│              │
 │  └────┬─────┘  └────┬─────┘  └──────────┘              │
 │       │              │                                   │
 │       └──── Angular Signals ──── Change Detection ─────│
 └─────────────────┬───────────────────────────────────────┘
-                  │  HTTP (REST API) + WebSocket (STOMP)
+                  │  HTTP (REST API) only
                   │  Authorization: Bearer <JWT Token>
 ┌─────────────────▼───────────────────────────────────────┐
 │                   SPRING BOOT BACKEND                    │
@@ -136,8 +136,8 @@ SmartTransportPooling solves this by allowing employees to **offer rides** (as d
 │                     MySQL Database                      │
 │   Database: smart_transport                             │
 │   Tables: users, trips, bookings, vehicles,             │
-│           organizations, notifications, chat_messages,  │
-│           trip_stops, password_reset_tokens,            │
+│           organizations, notifications, trip_stops,     │
+│           password_reset_tokens,                        │
 │           email_verification_tokens                     │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -411,7 +411,7 @@ The project uses manual `FilterRegistrationBean` instead of `WebSecurityConfigur
 | Endpoint | Purpose |
 |---|---|
 | GET `/` | Get all notifications for user |
-| GET `/unread-count` | Badge count (polled every 15 s by frontend) |
+| GET `/unread-count` | Badge count (polled every 60 s by frontend) |
 | PUT `/{id}/read` | Mark single notification read |
 | PUT `/read-all` | Mark all read |
 
@@ -420,7 +420,7 @@ Handles vehicle registration by drivers and listing their own vehicles. New vehi
 
 ---
 
-### 5.5 Services
+### 5.4 Services
 
 #### `AuthService`
 **Register flow:**
@@ -535,9 +535,6 @@ All methods annotated `@Async` — run in a separate thread pool so the HTTP res
 **Vehicle approval**: `vehicle.setApproved(true)` — after which the driver can use it on trips.
 
 **getStats()**: Counts from each repository — used for the admin dashboard overview.
-
-#### `ChatService`
-Removed — chat feature is not part of the current version.
 
 #### `VehicleService`
 Simple: create vehicle with `approved=false`, list by driver. Admin manually approves.
@@ -655,7 +652,6 @@ All below protected by AuthGuard:
 /trip-bookings/:id → driver manages bookings
 /profile         → user profile
 /notifications   → notification list
-/chat/:tripId    → chat page
 
 /admin/*  protected by AdminGuard:
 /admin/dashboard → stats
@@ -706,7 +702,7 @@ return payload.exp * 1000 > Date.now(); // check expiry
 
 #### `NotificationService`
 - `getNotifications()` → GET `/api/notifications`
-- `getUnreadCount()` → GET `/api/notifications/unread-count` (called every 15 s by `Layout` to update badge)
+- `getUnreadCount()` → GET `/api/notifications/unread-count` (called every 60 s by `Layout` to update badge)
 - `markAsRead(id)` / `markAllRead()` → PUT
 
 #### `VehicleService`
@@ -1064,13 +1060,13 @@ Response: { "id": 1, "status": "PENDING", "fare": 500, ... }
 ## 10. Common Interview Questions & Answers
 
 **Q: What is SmartTransportPooling?**
-A: A corporate ride-sharing platform where employees of whitelisted organizations can offer or book rides. It uses Spring Boot REST API + MySQL backend and Angular 19 frontend with real-time WebSocket notifications and email alerts.
+A: A corporate ride-sharing platform where employees of whitelisted organizations can offer or book rides. It uses Spring Boot REST API + MySQL backend and Angular 19 frontend with HTTP polling-based in-app notifications and email alerts.
 
 **Q: How is authentication handled?**
 A: JWT (JSON Web Token) based stateless authentication. On login, the backend generates a signed JWT token with the user's email as subject, expiring in 24 hours. The frontend stores it in localStorage and the `auth.interceptor.ts` attaches it as `Authorization: Bearer <token>` to every HTTP request. The `JwtAuthenticationFilter` validates it before every controller call.
 
 **Q: How does the booking approval flow work?**
-A: Passenger requests booking → if MANUAL mode, status is PENDING; if AUTO mode, instantly APPROVED. For MANUAL: driver sees the request in `/trip-bookings`, clicks Approve → backend sets status APPROVED, deducts available seats, sends in-app notification via WebSocket and email to the passenger.
+A: Passenger requests booking → if MANUAL mode, status is PENDING; if AUTO mode, instantly APPROVED. For MANUAL: driver sees the request in `/trip-bookings`, clicks Approve → backend sets status APPROVED, deducts available seats, saves an in-app notification to the database and sends an email to the passenger.
 
 **Q: What is the difference between MANUAL and AUTO approval?**
 A: AUTO: booking is immediately approved when requested, seats deducted right away. MANUAL: booking waits as PENDING until the driver explicitly approves/rejects it. Seats are only deducted upon approval.
