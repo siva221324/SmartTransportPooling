@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+ "outputDirectory": "dist/SmartTransport_Frontend/browser"
+}
