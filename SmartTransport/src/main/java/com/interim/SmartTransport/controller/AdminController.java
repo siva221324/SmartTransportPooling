@@ -23,6 +23,7 @@ public class AdminController {
     public ResponseEntity<Map<String, Object>> getStats() {
         return ResponseEntity.ok(adminService.getStats());
     }
+    
 
     @PostMapping("/organizations")
     public ResponseEntity<Organization> createOrganization(@Valid @RequestBody OrganizationRequest request) {
