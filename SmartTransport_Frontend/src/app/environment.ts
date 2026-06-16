@@ -1,4 +1,4 @@
 export const environment = {
-  apiUrl: 'http://localhost:8081/api',
+  apiUrl: 'https://smarttransportpooling-production.up.railway.app/api',
 };
 
