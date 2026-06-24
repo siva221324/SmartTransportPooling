@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -135,7 +136,6 @@ public class TripService {
                 .status(TripStatus.SCHEDULED)
                 .build();
     }
-
     public List<Trip> searchTrips(TripSearchRequest request, String passengerEmail) {
         User passenger = userRepository.findByEmail(passengerEmail).orElseThrow();
 
@@ -143,13 +143,29 @@ public class TripService {
         String destination = normalize(request.getDestination());
         String city = normalize(passenger.getCity());
 
+        LocalDateTime departureAfter = request.getDepartureAfter() != null
+                ? request.getDepartureAfter()
+                : LocalDateTime.now();
+
+        LocalDateTime departureBefore = request.getDepartureBefore() != null
+                ? request.getDepartureBefore()
+                : LocalDateTime.now().plusYears(10);
+
+        BigDecimal minPrice = request.getMinPrice() != null
+                ? request.getMinPrice()
+                : BigDecimal.ZERO;
+
+        BigDecimal maxPrice = request.getMaxPrice() != null
+                ? request.getMaxPrice()
+                : new BigDecimal("9999999");
+
         return tripRepository.searchTrips(
                 origin,
                 destination,
-                request.getDepartureAfter(),
-                request.getDepartureBefore(),
-                request.getMinPrice(),
-                request.getMaxPrice(),
+                departureAfter,
+                departureBefore,
+                minPrice,
+                maxPrice,
                 request.getGender(),
                 city,
                 passenger.getId()
@@ -157,7 +173,7 @@ public class TripService {
     }
 
     private String normalize(String value) {
-        return (value == null || value.isBlank()) ? null : value.trim();
+        return value == null || value.isBlank() ? null : value.trim();
     }
     public Trip getTrip(Long id) {
         return tripRepository.findById(id)
