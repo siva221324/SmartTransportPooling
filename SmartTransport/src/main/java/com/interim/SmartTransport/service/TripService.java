@@ -138,10 +138,14 @@ public class TripService {
 
     public List<Trip> searchTrips(TripSearchRequest request, String passengerEmail) {
         User passenger = userRepository.findByEmail(passengerEmail).orElseThrow();
-        String city = passenger.getCity();
+
+        String origin = normalize(request.getOrigin());
+        String destination = normalize(request.getDestination());
+        String city = normalize(passenger.getCity());
+
         return tripRepository.searchTrips(
-                request.getOrigin(),
-                request.getDestination(),
+                origin,
+                destination,
                 request.getDepartureAfter(),
                 request.getDepartureBefore(),
                 request.getMinPrice(),
@@ -152,6 +156,9 @@ public class TripService {
         );
     }
 
+    private String normalize(String value) {
+        return (value == null || value.isBlank()) ? null : value.trim();
+    }
     public Trip getTrip(Long id) {
         return tripRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Trip not found"));

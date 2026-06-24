@@ -29,20 +29,40 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     @Query("SELECT DISTINCT s.stopName FROM TripStop s JOIN s.trip t WHERE t.status = 'SCHEDULED' AND t.availableSeats > 0 AND t.departureTime > CURRENT_TIMESTAMP")
     List<String> findDistinctStopNames();
 
-    @Query("SELECT t FROM Trip t WHERE t.status = 'SCHEDULED' " +
-            "AND t.departureTime > CURRENT_TIMESTAMP " +
-            "AND (:origin IS NULL OR LOWER(t.origin) LIKE LOWER(CONCAT('%', :origin, '%')) " +
-            "     OR EXISTS (SELECT 1 FROM TripStop s WHERE s.trip = t AND LOWER(s.stopName) LIKE LOWER(CONCAT('%', :origin, '%')))) " +
-            "AND (:destination IS NULL OR LOWER(t.destination) LIKE LOWER(CONCAT('%', :destination, '%')) " +
-            "     OR EXISTS (SELECT 1 FROM TripStop s2 WHERE s2.trip = t AND LOWER(s2.stopName) LIKE LOWER(CONCAT('%', :destination, '%')))) " +
-            "AND (:departureAfter IS NULL OR t.departureTime >= :departureAfter) " +
-            "AND (:departureBefore IS NULL OR t.departureTime <= :departureBefore) " +
-            "AND (:maxPrice IS NULL OR t.pricePerSeat <= :maxPrice OR t.dailyRate <= :maxPrice) " +
-            "AND (:minPrice IS NULL OR t.pricePerSeat >= :minPrice OR t.dailyRate >= :minPrice) " +
-            "AND (:gender IS NULL OR t.driver.gender = :gender) " +
-            "AND (:city IS NULL OR t.driver.city = :city) " +
-            "AND t.driver.id <> :excludeDriverId " +
-            "AND t.availableSeats > 0")
+    @Query("""
+SELECT t FROM Trip t
+WHERE t.status = 'SCHEDULED'
+AND t.departureTime > CURRENT_TIMESTAMP
+
+AND (
+    :origin IS NULL
+    OR LOWER(t.origin) LIKE LOWER(CONCAT('%', CAST(:origin AS string), '%'))
+    OR EXISTS (
+        SELECT 1 FROM TripStop s
+        WHERE s.trip = t
+        AND LOWER(s.stopName) LIKE LOWER(CONCAT('%', CAST(:origin AS string), '%'))
+    )
+)
+
+AND (
+    :destination IS NULL
+    OR LOWER(t.destination) LIKE LOWER(CONCAT('%', CAST(:destination AS string), '%'))
+    OR EXISTS (
+        SELECT 1 FROM TripStop s2
+        WHERE s2.trip = t
+        AND LOWER(s2.stopName) LIKE LOWER(CONCAT('%', CAST(:destination AS string), '%'))
+    )
+)
+
+AND (:departureAfter IS NULL OR t.departureTime >= :departureAfter)
+AND (:departureBefore IS NULL OR t.departureTime <= :departureBefore)
+AND (:maxPrice IS NULL OR t.pricePerSeat <= :maxPrice OR t.dailyRate <= :maxPrice)
+AND (:minPrice IS NULL OR t.pricePerSeat >= :minPrice OR t.dailyRate >= :minPrice)
+AND (:gender IS NULL OR t.driver.gender = :gender)
+AND (:city IS NULL OR t.driver.city = :city)
+AND t.driver.id <> :excludeDriverId
+AND t.availableSeats > 0
+""")
     List<Trip> searchTrips(
             @Param("origin") String origin,
             @Param("destination") String destination,
