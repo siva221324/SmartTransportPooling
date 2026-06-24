@@ -54,10 +54,10 @@ AND (
     )
 )
 
-AND (:departureAfter IS NULL OR t.departureTime >= :departureAfter)
-AND (:departureBefore IS NULL OR t.departureTime <= :departureBefore)
-AND (:maxPrice IS NULL OR t.pricePerSeat <= :maxPrice OR t.dailyRate <= :maxPrice)
-AND (:minPrice IS NULL OR t.pricePerSeat >= :minPrice OR t.dailyRate >= :minPrice)
+AND t.departureTime >= :departureAfter
+AND t.departureTime <= :departureBefore
+AND (t.pricePerSeat <= :maxPrice OR t.dailyRate <= :maxPrice)
+AND (t.pricePerSeat >= :minPrice OR t.dailyRate >= :minPrice)
 AND (:gender IS NULL OR t.driver.gender = :gender)
 AND (:city IS NULL OR t.driver.city = :city)
 AND t.driver.id <> :excludeDriverId
