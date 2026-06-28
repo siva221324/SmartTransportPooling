@@ -32,7 +32,6 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     @Query("""
 SELECT t FROM Trip t
 WHERE t.status = 'SCHEDULED'
-AND t.departureTime > CURRENT_TIMESTAMP
 
 AND (
     :origin IS NULL
